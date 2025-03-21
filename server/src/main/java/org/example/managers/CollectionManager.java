@@ -46,19 +46,19 @@ public class CollectionManager {
         if (bands.isEmpty()) {
             throw new EmptyCollectionException();
         }
-        Map<Label, List<MusicBand>> grouped = bands.stream().collect(Collectors.groupingBy(MusicBand::getLabel));
-        StringBuilder builder = null;
-        for (Map.Entry<Label, List<MusicBand>> entry : grouped.entrySet()) {
-            String label = entry.getKey().toString();
-            List<MusicBand> musicBands = entry.getValue();
-            builder = new StringBuilder();
-            builder.append(label).append(", Count: ").append(musicBands.size()).append("\n");
-            for (MusicBand musicBand : musicBands) {
-                builder.append(musicBand.toString()).append("\n");
-            }
 
-        }
-        return builder.toString();
+        return bands.stream()
+                .collect(Collectors.groupingBy(MusicBand::getLabel))
+                .entrySet().stream()
+                .map(entry -> {
+                    String label = entry.getKey().toString();
+                    List<MusicBand> musicBands = entry.getValue();
+                    return label + ", Count: " + musicBands.size() + "\n" +
+                            musicBands.stream()
+                                    .map(MusicBand::toString)
+                                    .collect(Collectors.joining("\n"));
+                })
+                .collect(Collectors.joining("\n"));
     }
 
     /**
@@ -268,33 +268,26 @@ public class CollectionManager {
      * Выводит названия лейблов в обратном алфавитном порядке.
      */
     public String printLabelField() {
-        List<String> labelList = new ArrayList<>();
-        for (MusicBand band : bands) {
-            labelList.add(band.getLabelName());
-        }
-        labelList.sort(Comparator.reverseOrder());
-        StringBuilder resp = new StringBuilder();
-        for (String label : labelList) {
-           resp.append(label).append("\n");
-        }
-        return resp.toString();
+        return bands.stream()
+                .map(MusicBand::getLabelName)
+                .sorted(Comparator.nullsLast(Comparator.reverseOrder()))
+                .collect(Collectors.joining("\n"));
     }
 
-    /**
-     * Выводит музыкальные группы в порядке возрастания.
-     *
-     * @throws EmptyCollectionException если коллекция пуста
-     */
+
+        /**
+         * Выводит музыкальные группы в порядке возрастания.
+         *
+         * @throws EmptyCollectionException если коллекция пуста
+         */
     public String printAscend() throws EmptyCollectionException {
-        StringBuilder resp = new StringBuilder();
         if (bands.isEmpty()) {
             throw new EmptyCollectionException();
         }
-        bands.sort(Comparator.naturalOrder());
-        for (MusicBand band : bands) {
-            resp.append(band.toString()).append("\n");
-        }
-        return resp.toString();
+        return bands.stream()
+                .sorted(Comparator.naturalOrder())
+                .map(MusicBand::toString)
+                .collect(Collectors.joining("\n"));
     }
 
     /**
@@ -303,14 +296,13 @@ public class CollectionManager {
      * @throws EmptyCollectionException если коллекция пуста
      */
     public String show() throws EmptyCollectionException {
-        StringBuilder resp = new StringBuilder();
         if (bands.isEmpty()) {
             throw new EmptyCollectionException();
         }
-        for (MusicBand band : bands) {
-            resp.append(band.toString()).append("\n");
-        }
-        return resp.toString();
+
+        return bands.stream()
+                .map(MusicBand::toString)
+                .collect(Collectors.joining("\n"));
     }
 
     /**
