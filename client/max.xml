@@ -236,4 +236,21 @@
       <sales>56</sales>
     </label>
   </mainClasses.MusicBand>
+  <mainClasses.MusicBand>
+    <id>15</id>
+    <name>1</name>
+    <coordinates>
+      <x>1.0</x>
+      <y>1</y>
+    </coordinates>
+    <creationDate>2025-03-26T16:25:24.5943637</creationDate>
+    <numberOfParticipants>1</numberOfParticipants>
+    <establishmentDate>1901-01-31 21:29:43.0 UTC</establishmentDate>
+    <genre>MATH_ROCK</genre>
+    <label>
+      <name>mada</name>
+      <bands>1</bands>
+      <sales>1</sales>
+    </label>
+  </mainClasses.MusicBand>
 </bands>

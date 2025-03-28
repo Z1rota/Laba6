@@ -234,8 +234,7 @@ public class CollectionManager {
      */
     public void shuffle() throws EmptyCollectionException {
         if (bands.isEmpty()) {
-            throw new EmptyCollectionException();
-        }
+            throw new EmptyCollectionException();}
         List<MusicBand> newCollection = new ArrayList<>(bands);
         Collections.shuffle(newCollection);
         Stack<MusicBand> shuffled = new Stack<>();

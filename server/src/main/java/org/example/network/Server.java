@@ -1,6 +1,7 @@
 package org.example.network;
 
 
+import org.example.commands.ExecuteScript;
 import org.example.managers.FileManager;
 import org.example.managers.RunManager;
 
@@ -39,7 +40,6 @@ public class Server {
 
     public void openServer() {
         try {
-
             serverSocket = ServerSocketChannel.open();
             serverSocket.bind(new InetSocketAddress(host,port));
             serverSocket.configureBlocking(false);
@@ -55,34 +55,12 @@ public class Server {
         try (ObjectInputStream clientReader = new ObjectInputStream(clientSocket.socket().getInputStream());
              ObjectOutputStream clientWriter = new ObjectOutputStream(clientSocket.socket().getOutputStream())) {
             userRequest = (Request) clientReader.readObject();
-            if (userRequest.getArgs() != null) {
-                if (userRequest.getArgs().equals("exit")) {
-                try {
-                    fileManager.saveObj(fileManager.getFilepath());
-                    Response response = new Response("Сохранение удалось. Выход из программы");
-                    clientWriter.writeObject(response);
-                    clientWriter.flush();
-
-                }catch (IOException | NullPointerException e) {
-                    logger.warning("Путь неверный, сохранение не удалось");
-                    Response response = new Response("Путь неверный, сохранение не удалось");
-                    clientWriter.writeObject(response);
-                    clientWriter.flush();
-                } finally {
-                    try {
-                        clientSocket.close();
-                    } catch (IOException e) {
-                        logger.warning("Ошибка при закрытии клиентского сокета");
-                    }
-                }
-                }
-            } else {
             logger.info("запрос с командой " + userRequest.getCommand().getName());
             responseToUser = runManager.run(userRequest);
             clientWriter.writeObject(responseToUser);
             logger.info("Отправлен ответ " + responseToUser.getResult());
             clientWriter.flush();
-            }
+
         } catch (ClassNotFoundException | InvalidClassException | NotSerializableException exception) {
             exception.printStackTrace();
             logger.warning("Ошибка при взаимодействии с клиентом!");
@@ -100,28 +78,38 @@ public class Server {
 
 
     public void run(String path) {
-            try {
-                openServer();
-                logger.info("Соединено с сервером найдено");
-                while (true) {
-                    if (scanner.ready()) {
+        try {
+            openServer();
+            logger.info("Соединение с сервером найдено");
+
+            Thread inputThread = new Thread(() -> {
+                try {
+                    while (true) {
                         String line = scanner.readLine();
                         if (line.equals("save")) {
                             fileManager.saveObj(path);
                             logger.info("Объекты сохранены");
                         }
                     }
-                    SocketChannel client = serverSocket.accept();
-                    if (client != null) {
-                        processClientRequest(client);
-                    }
+                } catch (IOException e) {
+                    logger.warning("Ошибка ввода");
+                }
+            });
+            inputThread.setDaemon(true);
+            inputThread.start();
 
+            while (true) {
+                SocketChannel client = serverSocket.accept();
+                if (client != null) {
+                    processClientRequest(client);
+                }
             }
 
-            }catch (IOException exception) {
-                logger.warning("Ошибка при использовании порта");
+
+        }catch (IOException exception) {
+                logger.warning("Ошибка при запуске");
             }catch(NotYetBoundException exception) {
-                logger.warning("Сервер уже запущен");
+                logger.warning("Порт уже занят");
             }
 
     }

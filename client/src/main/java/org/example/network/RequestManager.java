@@ -35,7 +35,6 @@ public class RequestManager {
             String cmd = (scanner.nextLine()+" ").trim();
             input = cmd.split(" ");
             if (input[0].equals("exit")) {
-                System.out.println(client.sendRequest(new Request("exit")).getResult());
                 System.out.println("До связи");
                 System.exit(0);
             }

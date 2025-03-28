@@ -48,7 +48,7 @@ public class ExecuteScript extends Command implements Serializable {
                 String[] cmd = (line.trim() + " ").split(" ", 2);
                 if (cmd[0].equals("execute_script")) {
                     if (ScriptExecuteManager.IsRepeat(cmd[1])) {
-                        stringBuilder.append(("Обнаружена рекурсия")).append("\n\n");
+                        stringBuilder.append(("Обнаружена рекурсия")).append("\n");
                         continue;
                     }
                 }

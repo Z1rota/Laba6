@@ -28,5 +28,5 @@ public abstract class Command implements Serializable {
         return name;
     }
 
-    public  abstract Response execute(Request request);
+    public abstract Response execute(Request request);
 }
